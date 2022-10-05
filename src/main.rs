@@ -23,6 +23,13 @@ fn print_usage(program: &str, opts: Options) {
     print!("{}", opts.usage(&brief));
 }
 
+/// Replaces a problem name with a canonical name.
+///
+/// This is for the convenience of the user.  Rather than, for example, typing
+/// "counting_dna_nucleotides", the user may want a shorter name, such as "counting-nucleotides" or
+/// "0".
+///
+/// For completed solutions, the alias that is a number should never change.
 fn normalize_problem_alias(problem: String) -> String {
     if problem == "0" {
         "counting_dna_nucleotides".to_owned()
@@ -35,6 +42,7 @@ fn normalize_problem_alias(problem: String) -> String {
     }
 }
 
+/// Run Rosalind problem solution.
 fn main() -> ExitCode {
     SimpleLogger::new()
         .without_timestamps()
