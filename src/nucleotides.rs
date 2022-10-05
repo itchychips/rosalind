@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use log::{trace};
+use log::trace;
 
 pub fn count_nucleotides_hashmap(input: &String) -> HashMap<char, i64> {
     let mut output = HashMap::new();
@@ -43,7 +43,7 @@ pub fn count_nucleotides(input: &String) -> NucleotideCounts {
             'G' => output.g += 1,
             'T' => output.t += 1,
             unknown => {
-                trace!("Skipping character: '{}'", unknown);
+                trace!("Skipping character with code: '{}' (code: {})", unknown.escape_debug(), unknown.escape_unicode());
             },
         }
     }
