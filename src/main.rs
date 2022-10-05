@@ -46,7 +46,12 @@ fn normalize_problem_alias(problem: String) -> String {
 }
 
 fn main() -> ExitCode {
-    SimpleLogger::new().without_timestamps().init().unwrap();
+    SimpleLogger::new()
+        .without_timestamps()
+        .with_level(log::LevelFilter::Trace)
+        .init()
+        .unwrap();
+    log::set_max_level(log::LevelFilter::Warn);
     // Hand off to another main so we can return an exit status easily.
     //std::process::exit(main2());
     let args: Vec<String> = env::args().collect();
