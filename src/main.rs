@@ -5,7 +5,7 @@ extern crate simple_logger;
 mod nucleotides;
 mod problems;
 
-use std::fs::read_to_string;
+use std::{fs::read_to_string, collections::HashMap};
 use std::env;
 use std::process::ExitCode;
 
@@ -31,15 +31,14 @@ fn print_usage(program: &str, opts: Options) {
 ///
 /// For completed solutions, the alias that is a number should never change.
 fn normalize_problem_alias(problem: String) -> String {
-    if problem == "0" {
-        "counting_dna_nucleotides".to_owned()
-    }
-    else if problem == "counting-nucleotides" {
-        "counting_dna_nucleotides".to_owned()
-    }
-    else {
-        problem
-    }
+    let mut aliases = HashMap::new();
+    aliases.insert("0".to_owned(), "counting_dna_nucleotides".to_owned());
+    aliases.insert("counting-nucleotides".to_owned(), "counting_dna_nucleotides".to_owned());
+    aliases.insert("1".to_owned(), "transcribing_dna_into_rna".to_owned());
+    aliases.insert("transcribing-dna".to_owned(), "transcribing_dna_into_rna".to_owned());
+    aliases.insert("2".to_owned(), "complementing_a_strand_of_dna".to_owned());
+    aliases.insert("complementing-dna".to_owned(), "complementing_a_strand_of_dna".to_owned());
+    aliases.get(&problem).unwrap_or(&problem).clone()
 }
 
 /// Run Rosalind problem solution.
@@ -124,6 +123,12 @@ fn main() -> ExitCode {
 
     if problem == "counting_dna_nucleotides" {
         problems::counting_dna_nucleotides(&input);
+    }
+    else if problem == "transcribing_dna_into_rna" {
+        problems::transcribing_dna_into_rna(&input);
+    }
+    else if problem == "complementing_a_strand_of_dna" {
+        problems::complementing_a_strand_of_dna(&input);
     }
     else {
         error!("Unknown problem description: {}", problem);

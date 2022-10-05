@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 
 use std::collections::HashMap;
+use std::convert::From;
 
 use log::{trace, warn};
 
@@ -83,7 +84,7 @@ pub fn count_nucleotides(input: &String) -> NucleotideCounts {
     output
 }
 
-#[derive(Debug,Eq,PartialEq)]
+#[derive(Clone,Copy,Debug,Eq,PartialEq)]
 pub enum Nucleotide {
     Adenine,
     Cytosine,
@@ -109,6 +110,40 @@ pub struct Dna {
     nucleotides: Vec<Nucleotide>,
 }
 
+impl From<String> for Dna {
+    fn from(string: String) -> Self {
+        Dna::new(&string)
+    }
+}
+
+impl From<&String> for Dna {
+    fn from(string: &String) -> Self {
+        Dna::new(&string)
+    }
+}
+
+impl From<Vec<Nucleotide>> for Dna {
+    fn from(vec: Vec<Nucleotide>) -> Self {
+        Dna::from_vec(vec)
+    }
+}
+
+impl From<Dna> for String {
+    fn from(dna: Dna) -> Self {
+        let mut string = String::new();
+        for nucleotide in dna.nucleotides {
+            match nucleotide {
+                Nucleotide::Adenine => string.push('A'),
+                Nucleotide::Cytosine => string.push('C'),
+                Nucleotide::Guanine => string.push('G'),
+                Nucleotide::Thymine => string.push('T'),
+                Nucleotide::Uracil => panic!("Uracil was not expected."),
+            }
+        }
+        string
+    }
+}
+
 impl Dna {
     pub fn new(input_nucleotides: &String) -> Dna {
         let mut nucleotides = Vec::new();
@@ -130,6 +165,12 @@ impl Dna {
         }
     }
 
+    pub fn from_vec(nucleotides: Vec<Nucleotide>) -> Dna {
+        Dna {
+            nucleotides
+        }
+    }
+
     pub fn count_nucleotide(&self, nucleotide: Nucleotide) -> i64 {
         let mut count = 0;
         for n in &self.nucleotides {
@@ -138,5 +179,109 @@ impl Dna {
             }
         }
         count
+    }
+
+    pub fn complement(&self) -> Dna {
+        let mut new = Vec::new();
+        for nucleotide in &self.nucleotides {
+            let complement = match nucleotide {
+                Nucleotide::Adenine => Nucleotide::Thymine,
+                Nucleotide::Cytosine => Nucleotide::Guanine,
+                Nucleotide::Guanine => Nucleotide::Cytosine,
+                Nucleotide::Thymine => Nucleotide::Adenine,
+                Nucleotide::Uracil => panic!("Uracil is invalid for DNA."),
+            };
+            new.push(complement);
+        }
+        Dna::from(new)
+    }
+
+    pub fn reverse_complement(&self) -> Dna {
+        let mut nucleotides = self.nucleotides.clone();
+        nucleotides.reverse();
+        let out = Dna::from(nucleotides);
+        let out = out.complement();
+        out
+    }
+}
+
+pub struct Rna {
+    nucleotides: Vec<Nucleotide>,
+}
+
+impl Rna {
+    pub fn new(input_nucleotides: &String) -> Rna {
+        let mut nucleotides = Vec::new();
+        for ch in input_nucleotides.chars() {
+            let nucleotide = Nucleotide::from_char(&ch);
+            if nucleotide.is_none() {
+                trace!("unknown nucleotide identifier: {} ({})", ch.escape_debug(), ch.escape_unicode());
+                continue;
+            }
+            let nucleotide = nucleotide.unwrap();
+            if nucleotide == Nucleotide::Thymine {
+                warn!("nucleotide thymine (T) is not valid for RNA.");
+                continue;
+            }
+            nucleotides.push(nucleotide);
+        }
+        Rna {
+            nucleotides,
+        }
+    }
+
+    pub fn count_nucleotide(&self, nucleotide: Nucleotide) -> i64 {
+        let mut count = 0;
+        for n in &self.nucleotides {
+            if n == &nucleotide {
+                count += 1;
+            }
+        }
+        count
+    }
+}
+
+impl From<String> for Rna {
+    fn from(string: String) -> Self {
+        Rna::new(&string)
+    }
+}
+
+impl From<&String> for Rna {
+    fn from(string: &String) -> Self {
+        Rna::new(&string)
+    }
+}
+
+impl From<Dna> for Rna {
+    fn from(dna: Dna) -> Self {
+        let nucleotides = dna.nucleotides;
+        let mut new_nucleotides = Vec::new();
+        for nucleotide in nucleotides {
+            match nucleotide {
+                Nucleotide::Thymine => new_nucleotides.push(Nucleotide::Uracil),
+                Nucleotide::Uracil => panic!("Uracil was not expected."),
+                other => new_nucleotides.push(other),
+            }
+        }
+        Rna {
+            nucleotides: new_nucleotides,
+        }
+    }
+}
+
+impl From<Rna> for String {
+    fn from(rna: Rna) -> Self {
+        let mut string = String::new();
+        for nucleotide in rna.nucleotides {
+            match nucleotide {
+                Nucleotide::Adenine => string.push('A'),
+                Nucleotide::Cytosine => string.push('C'),
+                Nucleotide::Guanine => string.push('G'),
+                Nucleotide::Uracil => string.push('U'),
+                Nucleotide::Thymine => panic!("Thymine was not expected."),
+            }
+        }
+        string
     }
 }
