@@ -1,4 +1,5 @@
-use crate::nucleotides;
+use crate::nucleotides::Dna;
+use crate::nucleotides::Nucleotide;
 
 /// Solve problem counting_dna_nucleotides.
 ///
@@ -12,9 +13,9 @@ use crate::nucleotides;
 /// want to use the solution generation directly.
 pub fn counting_dna_nucleotides(input: &String)
 {
-    let nucleotide_counts = nucleotides::count_nucleotides(&input);
-    print!("{} ", nucleotide_counts.a);
-    print!("{} ", nucleotide_counts.c);
-    print!("{} ", nucleotide_counts.g);
-    print!("{}\n", nucleotide_counts.t);
+    let dna = Dna::new(&input);
+    print!("{} ", dna.count_nucleotide(Nucleotide::Adenine));
+    print!("{} ", dna.count_nucleotide(Nucleotide::Cytosine));
+    print!("{} ", dna.count_nucleotide(Nucleotide::Guanine));
+    print!("{}\n", dna.count_nucleotide(Nucleotide::Thymine));
 }

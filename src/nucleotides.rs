@@ -2,7 +2,7 @@
 
 use std::collections::HashMap;
 
-use log::trace;
+use log::{trace, warn};
 
 /// Count nucleotides using a hashmap.
 ///
@@ -81,4 +81,62 @@ pub fn count_nucleotides(input: &String) -> NucleotideCounts {
         }
     }
     output
+}
+
+#[derive(Debug,Eq,PartialEq)]
+pub enum Nucleotide {
+    Adenine,
+    Cytosine,
+    Guanine,
+    Thymine,
+    Uracil,
+}
+
+impl Nucleotide {
+    pub fn from_char(ch: &char) -> Option<Nucleotide> {
+        match ch {
+            'A' => Some(Nucleotide::Adenine),
+            'C' => Some(Nucleotide::Cytosine),
+            'G' => Some(Nucleotide::Guanine),
+            'T' => Some(Nucleotide::Thymine),
+            'U' => Some(Nucleotide::Uracil),
+            _ => None
+        }
+    }
+}
+
+pub struct Dna {
+    nucleotides: Vec<Nucleotide>,
+}
+
+impl Dna {
+    pub fn new(input_nucleotides: &String) -> Dna {
+        let mut nucleotides = Vec::new();
+        for ch in input_nucleotides.chars() {
+            let nucleotide = Nucleotide::from_char(&ch);
+            if nucleotide.is_none() {
+                trace!("unknown nucleotide identifier: {} ({})", ch.escape_debug(), ch.escape_unicode());
+                continue;
+            }
+            let nucleotide = nucleotide.unwrap();
+            if nucleotide == Nucleotide::Uracil {
+                warn!("nucleotide uracil (U) is not valid for DNA.");
+                continue;
+            }
+            nucleotides.push(nucleotide);
+        }
+        Dna {
+            nucleotides,
+        }
+    }
+
+    pub fn count_nucleotide(&self, nucleotide: Nucleotide) -> i64 {
+        let mut count = 0;
+        for n in &self.nucleotides {
+            if n == &nucleotide {
+                count += 1;
+            }
+        }
+        count
+    }
 }
