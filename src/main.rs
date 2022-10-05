@@ -5,9 +5,7 @@ extern crate simple_logger;
 mod nucleotides;
 mod problems;
 
-use std::fs::File;
-use std::io;
-use std::io::prelude::Read;
+use std::fs::read_to_string;
 use std::env;
 use std::process::ExitCode;
 
@@ -23,14 +21,6 @@ fn print_usage(program: &str, opts: Options) {
 
         Run rosalind PROBLEM on input FILE."#, program);
     print!("{}", opts.usage(&brief));
-}
-
-fn read_file(path: &String) -> io::Result<String> {
-    let mut output = String::new();
-    let size_read = File::open(path)?.read_to_string(&mut output)?;
-    info!("Size read: {}", size_read);
-
-    Ok(output)
 }
 
 fn normalize_problem_alias(problem: String) -> String {
@@ -114,7 +104,7 @@ fn main() -> ExitCode {
         return ExitCode::from(2);
     };
 
-    let input = match read_file(&input_path) {
+    let input = match read_to_string(&input_path) {
         Ok(text) => text,
         Err(e) => {
             error!("{}", e);
