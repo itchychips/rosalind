@@ -52,15 +52,12 @@ fn main() -> ExitCode {
         .init()
         .unwrap();
     log::set_max_level(log::LevelFilter::Warn);
-    // Hand off to another main so we can return an exit status easily.
-    //std::process::exit(main2());
     let args: Vec<String> = env::args().collect();
     let program = args[0].clone();
 
     let mut opts = Options::new();
     opts.optflagmulti("h", "help", "print this help menu");
     opts.optflagmulti("l", "list-problems", "list problems implemented");
-    // TODO: Implement multiple verbosity levels.
     opts.optflagmulti("v", "verbose", "increase verbosity level to info");
     opts.optflagmulti("t", "trace", "increase verbosity level to trace (overrides -v)");
 
